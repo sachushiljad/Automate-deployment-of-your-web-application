@@ -10,25 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Copy code to EC2
-      uses: appleboy/ssh-action@v0.1.8
-      with:
-        host: ${{ secrets.EC2_IP }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        port: 22
-        script: |
-          echo "Deploying code..."
-          cd /var/www/html
-          # Backup existing index.html
-          if [ -f index.html ]; then mv index.html index.html.bak; fi
-          # Copy new file from GitHub runner
-          echo "${{ steps.checkout.outputs.path }}/index.html"  # Debug
-          # Using scp-like approach
-          cat <<'EOF' > index.html
-$(cat index.html)
-EOF
-          sudo systemctl restart apache2
+      - name: Copy index.html to EC2
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: |
+            echo "Deploying index.html..."
+            # Backup existing index.html
+            if [ -f /var/www/html/index.html ]; then
+              mv /var/www/html/index.html /var/www/html/index.html.bak
+            fi
+          # Upload index.html from GitHub runner
+          local_path: index.html
+          remote_path: /var/www/html/index.html
+
+      - name: Restart Apache
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: sudo systemctl restart apache2
