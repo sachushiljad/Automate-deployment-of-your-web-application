@@ -13,15 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy index.html to EC2
-        run: |
-          echo "$EC2_KEY" > key.pem
-          chmod 600 key.pem
-          scp -o StrictHostKeyChecking=no -i key.pem index.html $EC2_USER@$EC2_IP:/var/www/html/index.html
-        env:
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_IP: ${{ secrets.EC2_IP }}
-          EC2_KEY: ${{ secrets.EC2_KEY }}
+     - name: Copy index.html to EC2
+  run: |
+    echo "$EC2_KEY" > key.pem
+    chmod 600 key.pem
+    scp -o StrictHostKeyChecking=no -i key.pem index.html $EC2_USER@$EC2_IP:/var/www/html/index.html
+  env:
+    EC2_USER: ${{ secrets.EC2_USER }}
+    EC2_IP: ${{ secrets.EC2_IP }}
+    EC2_KEY: ${{ secrets.EC2_KEY }}
 
       - name: Restart Apache
         uses: appleboy/ssh-action@v0.1.8
