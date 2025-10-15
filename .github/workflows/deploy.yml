@@ -15,7 +15,7 @@ jobs:
 
       - name: Copy index.html to EC2
         run: |
-          echo "$EC2_KEY" > key.pem
+          echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
           scp -o StrictHostKeyChecking=no -i key.pem index.html $EC2_USER@$EC2_IP:/var/www/html/index.html
         env:
